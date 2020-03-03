@@ -1,5 +1,5 @@
 //
-//  UserTest.swift
+//  UserTests.swift
 //  AcronymsAppPackageDescription
 //
 //  Created by Mykhailo Bondarenko on 03.03.2020.
@@ -55,7 +55,7 @@ final class UserTests: XCTestCase {
         // MARK: - Test
         // Define expected values
         let expectedName = "Darth"
-        let expectedUsername = "Vaider"
+        let expectedUsername = "vaider"
         
         // Create application
         var config = Config.default()
@@ -71,7 +71,7 @@ final class UserTests: XCTestCase {
         // Create a couple of users
         let user = User(name: expectedName, username: expectedUsername)
         let savedUser = try user.save(on: connection).wait()
-        _ = try User(name: "Like", username: "Skywalker")
+        _ = try User(name: "Like", username: "skywalker")
         
         // Create Responder
         let responder = try app.make(Responder.self)
