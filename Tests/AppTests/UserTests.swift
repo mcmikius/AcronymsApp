@@ -53,12 +53,27 @@ final class UserTests: XCTestCase {
     }
     
     func testGettingASingleUserFromTheAPI() throws {
-      let user = try User.create(name: usersName, username: usersUsername, on: connection)
-      let receivedUser = try app.getResponse(to: "\(usersURI)\(user.id!)", decodeTo: User.self)
-
-      XCTAssertEqual(receivedUser.name, usersName)
-      XCTAssertEqual(receivedUser.username, usersUsername)
-      XCTAssertEqual(receivedUser.id, user.id)
+        let user = try User.create(name: usersName, username: usersUsername, on: connection)
+        let receivedUser = try app.getResponse(to: "\(usersURI)\(user.id!)", decodeTo: User.self)
+        
+        XCTAssertEqual(receivedUser.name, usersName)
+        XCTAssertEqual(receivedUser.username, usersUsername)
+        XCTAssertEqual(receivedUser.id, user.id)
+    }
+    
+    func testGettingAUsersAcronymsFromTheAPI() throws {
+        let user = try User.create(on: connection)
+        let acronymShort = "OMG"
+        let acronymLong = "Oh My God"
+        let acronym1 = try Acronym.create(short: acronymShort, long: acronymLong, user: user, on: connection)
+        _ = try Acronym.create(short: "LOL", long: "Laugh Out Loud", user: user, on: connection)
+        
+        let acronyms = try app.getResponse(to: "\(usersURI)\(user.id!)/acronyms", decodeTo: [Acronym].self)
+        
+        XCTAssertEqual(acronyms.count, 2)
+        XCTAssertEqual(acronyms[0].id, acronym1.id)
+        XCTAssertEqual(acronyms[0].short, acronymShort)
+        XCTAssertEqual(acronyms[0].long, acronymLong)
     }
     
     override func tearDown() {
