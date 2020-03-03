@@ -24,6 +24,11 @@ final class UserTests: XCTestCase {
         connection = try! app.newConnection(to: .psql).wait()
     }
     
+    override func tearDown() {
+        connection.close()
+        try? app.syncShutdownGracefully()
+    }
+    
     func testUsersCanBeRetrievedFromAPI() throws {
         let user = try User.create(name: usersName, username: usersUsername, on: connection)
         _ = try User.create(on: connection)
@@ -75,10 +80,4 @@ final class UserTests: XCTestCase {
         XCTAssertEqual(acronyms[0].short, acronymShort)
         XCTAssertEqual(acronyms[0].long, acronymLong)
     }
-    
-    override func tearDown() {
-        connection.close()
-        try? app.syncShutdownGracefully()
-    }
-    
 }
