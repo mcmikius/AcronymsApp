@@ -1,5 +1,5 @@
 
-FROM swift:5.1
+FROM swift:5.1.3
 
 WORKDIR /package
 
