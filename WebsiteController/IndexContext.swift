@@ -6,5 +6,5 @@ import Foundation
 
 struct IndexContext: Encodable {
     let title: String
-    let acronyms: [Acronym]?
+    let acronyms: [Acronym]
 }

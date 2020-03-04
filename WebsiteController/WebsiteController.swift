@@ -16,8 +16,7 @@ struct WebsiteController: RouteCollection {
 
     func indexHandler(_ req: Request) throws -> Future<View> {
         return Acronym.query(on: req).all().flatMap(to: View.self) { acronyms in
-            let acronymsData = acronyms.isEmpty ? nil : acronyms
-            let context = IndexContext(title: "Home page", acronyms: acronymsData)
+            let context = IndexContext(title: "Home page", acronyms: acronyms)
             return try req.view().render("index", context)
         }
     }
