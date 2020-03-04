@@ -10,6 +10,7 @@ struct WebsiteController: RouteCollection {
     func boot(router: Router) throws {
         router.get(use: indexHandler)
         router.get("acronyms", Acronym.parameter, use: acronymHandler)
+        router.get("users", User.parameter, use: userHandler)
     }
 
     func indexHandler(_ req: Request) throws -> Future<View> {
@@ -25,6 +26,15 @@ struct WebsiteController: RouteCollection {
             return acronym.user.get(on: req).flatMap(to: View.self) { user in
                 let context = AcronymContext(title: acronym.short, acronym: acronym, user: user)
                 return try req.view().render("acronym", context)
+            }
+        }
+    }
+
+    func userHandler(_ req: Request) throws -> Future<View> {
+        return try req.parameters.next(User.self).flatMap(to: View.self) { user in
+            return try user.acronyms.query(on: req).all().flatMap(to: View.self) { acronyms in
+                let context = UserContext(title: user.name, user: user, acronyms: acronyms)
+                return try req.view().render("user", context)
             }
         }
     }
