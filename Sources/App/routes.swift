@@ -13,4 +13,6 @@ public func routes(_ router: Router) throws {
     let categoriesCantroller = CategoriesController()
     try router.register(collection: categoriesCantroller)
 
+    let websiteController = WebsiteController()
+    try router.register(collection: websiteController)
 }
