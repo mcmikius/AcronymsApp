@@ -9,7 +9,7 @@ import Leaf
 struct WebsiteController: RouteCollection {
     func boot(router: Router) throws {
         router.get(use: indexHandler)
-        router.get("acronym", Acronym.parameter, use: acronymHandler)
+        router.get("acronyms", Acronym.parameter, use: acronymHandler)
     }
 
     func indexHandler(_ req: Request) throws -> Future<View> {
