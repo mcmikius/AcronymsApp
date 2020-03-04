@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Vapor
 
 struct AcronymContext: Encodable {
     let title: String

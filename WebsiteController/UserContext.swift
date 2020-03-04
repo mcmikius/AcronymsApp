@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Vapor
 
 struct UserContext: Encodable {
     let title: String

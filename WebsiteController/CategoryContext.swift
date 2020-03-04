@@ -5,7 +5,8 @@
 import Foundation
 import Vapor
 
-struct IndexContext: Encodable {
+struct CategoryContext: Encodable {
     let title: String
-    let acronyms: [Acronym]
+    let category: Category
+    let acronyms: Future<[Acronym]>
 }
