@@ -10,21 +10,23 @@ import Authentication
 struct WebsiteController: RouteCollection {
 
     func boot(router: Router) throws {
-        router.get(use: indexHandler)
-        router.get("acronyms", Acronym.parameter, use: acronymHandler)
-        router.get("users", User.parameter, use: userHandler)
-        router.get("users", use: allUsersHandler)
-        router.get("categories", use: allCategoriesHandler)
-        router.get("categories", Category.parameter, use: categoryHandler)
-        router.get("acronyms", "create", use: createAcronymHandler)
-        router.post(CreateAcronymData.self, at: "acronyms", "create", use: createAcronymPostHandler)
-        router.get("acronyms", Acronym.parameter, "edit", use: editAcronymHandler)
-        router.post("acronyms", Acronym.parameter, "edit", use: editAcronymPostHandler)
-        router.post("acronyms", Acronym.parameter, "delete", use: deleteAcronymHandler)
-        router.get("login", use: loginHandler)
-        router.post(LoginPostData.self, at: "login", use: loginPostHandler)
 
         let authSessionRoutes = router.grouped(User.authSessionsMiddleware())
+        authSessionRoutes.get(use: indexHandler)
+        authSessionRoutes.get("acronyms", Acronym.parameter, use: acronymHandler)
+        authSessionRoutes.get("users", User.parameter, use: userHandler)
+        authSessionRoutes.get("users", use: allUsersHandler)
+        authSessionRoutes.get("categories", use: allCategoriesHandler)
+        authSessionRoutes.get("categories", Category.parameter, use: categoryHandler)
+        authSessionRoutes.get("login", use: loginHandler)
+        authSessionRoutes.post(LoginPostData.self, at: "login", use: loginPostHandler)
+
+        let protectedRoutes = authSessionRoutes.grouped(RedirectMiddleware<User>(path: "/login"))
+        protectedRoutes.get("acronyms", "create", use: createAcronymHandler)
+        protectedRoutes.post(CreateAcronymData.self, at: "acronyms", "create", use: createAcronymPostHandler)
+        protectedRoutes.get("acronyms", Acronym.parameter, "edit", use: editAcronymHandler)
+        protectedRoutes.post("acronyms", Acronym.parameter, "edit", use: editAcronymPostHandler)
+        protectedRoutes.post("acronyms", Acronym.parameter, "delete", use: deleteAcronymHandler)
     }
 
     func indexHandler(_ req: Request) throws -> Future<View> {
