@@ -186,6 +186,11 @@ struct WebsiteController: RouteCollection {
     }
 
     func registerPostHandler(_ req: Request, data: RegisterData) throws -> Future<Response> {
+        do {
+            try data.validate()
+        } catch {
+            return req.future(req.redirect(to: "/register"))
+        }
         let password = try BCrypt.hash(data.password)
         let user = User(name: data.name, username: data.username, password: password)
         return user.save(on: req).map(to: Response.self) { user in
