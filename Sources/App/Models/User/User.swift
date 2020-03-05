@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import FluentPostgreSQL
+import Authentication
 
 final class User: Codable {
 
