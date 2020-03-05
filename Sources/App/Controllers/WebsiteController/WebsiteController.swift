@@ -5,6 +5,7 @@
 import Foundation
 import Vapor
 import Leaf
+import Authentication
 
 struct WebsiteController: RouteCollection {
 
@@ -20,6 +21,10 @@ struct WebsiteController: RouteCollection {
         router.get("acronyms", Acronym.parameter, "edit", use: editAcronymHandler)
         router.post("acronyms", Acronym.parameter, "edit", use: editAcronymPostHandler)
         router.post("acronyms", Acronym.parameter, "delete", use: deleteAcronymHandler)
+        router.get("login", use: loginHandler)
+        router.post(LoginPostData.self, at: "login", use: loginPostHandler)
+
+        let authSessionRoutes = router.grouped(User.authSessionsMiddleware())
     }
 
     func indexHandler(_ req: Request) throws -> Future<View> {
@@ -133,5 +138,25 @@ struct WebsiteController: RouteCollection {
 
     func deleteAcronymHandler(_ req: Request) throws -> Future<Response> {
         return try req.parameters.next(Acronym.self).delete(on: req).transform(to: req.redirect(to: "/"))
+    }
+
+    func loginHandler(_ req: Request) throws -> Future<View> {
+        let context: LoginContext
+        if req.query[Bool.self, at: "error"] != nil {
+            context = LoginContext(loginError: true)
+        } else {
+            context = LoginContext()
+        }
+        return try req.view().render("login", context)
+    }
+
+    func loginPostHandler(_ req: Request, userData: LoginPostData) throws -> Future<Response> {
+        return User.authenticate(username: userData.username, password: userData.password, using: BCryptDigest(), on: req).map(to: Response.self) { user in
+            guard let user = user else {
+                return req.redirect(to: "/login?error")
+            }
+            try req.authenticateSession(user)
+            return req.redirect(to: "/")
+        }
     }
 }
