@@ -33,7 +33,8 @@ struct WebsiteController: RouteCollection {
     func indexHandler(_ req: Request) throws -> Future<View> {
         return Acronym.query(on: req).all().flatMap(to: View.self) { acronyms in
             let userLoggedIn = try req.isAuthenticated(User.self)
-            let context = IndexContext(title: "Home page", acronyms: acronyms, userLoggedIn: userLoggedIn)
+            let showCookieMessage = req.http.cookies["cookies-accepted"] == nil
+            let context = IndexContext(title: "Home page", acronyms: acronyms, userLoggedIn: userLoggedIn, showCookieMessage: showCookieMessage)
             return try req.view().render("index", context)
         }
     }
