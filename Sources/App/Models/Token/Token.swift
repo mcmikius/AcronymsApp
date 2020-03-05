@@ -27,3 +27,8 @@ extension Token {
         return try Token(token: random.base64URLEncodedString(), userID: user.requireID())
     }
 }
+
+extension Token: Authentication.Token {
+    public static let userIDKey: UserIDKey = \Token.userID
+    typealias UserType = User
+}
