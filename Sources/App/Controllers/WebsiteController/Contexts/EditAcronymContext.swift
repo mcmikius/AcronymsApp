@@ -8,7 +8,6 @@ import Vapor
 struct EditAcronymContext: Encodable {
     let title: String = "Edit Acronym"
     let acronym: Acronym
-    let users: Future<[User]>
     let categories: Future<[Category]>
     let editing: Bool = true
 }

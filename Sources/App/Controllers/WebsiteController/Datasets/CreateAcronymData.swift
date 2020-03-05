@@ -6,7 +6,6 @@ import Foundation
 import Vapor
 
 struct CreateAcronymData: Content {
-    let userID: User.ID
     let short: String
     let long: String
     let categories: [String]?

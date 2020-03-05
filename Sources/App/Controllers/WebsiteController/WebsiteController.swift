@@ -78,12 +78,13 @@ struct WebsiteController: RouteCollection {
     }
 
     func createAcronymHandler(_ req: Request) throws -> Future<View> {
-        let context = CreateAcronymContext(users: User.query(on: req).all())
+        let context = CreateAcronymContext()
         return try req.view().render("createAcronym", context)
     }
 
     func createAcronymPostHandler(_ req: Request, data: CreateAcronymData) throws -> Future<Response> {
-        let acronym = Acronym(short: data.short, long: data.long, userID: data.userID)
+        let user = try req.requireAuthenticated(User.self)
+        let acronym = try Acronym(short: data.short, long: data.long, userID: user.requireID())
         return acronym.save(on: req).flatMap(to: Response.self) { acronym in
             guard let id = acronym.id else {
                 throw Abort(.internalServerError)
@@ -99,18 +100,18 @@ struct WebsiteController: RouteCollection {
 
     func editAcronymHandler(_ req: Request) throws -> Future<View> {
         return try req.parameters.next(Acronym.self).flatMap(to: View.self) { acronym in
-            let users = User.query(on: req).all()
             let categories = try acronym.categories.query(on: req).all()
-            let context = EditAcronymContext(acronym: acronym, users: User.query(on: req).all(), categories: categories)
+            let context = EditAcronymContext(acronym: acronym, categories: categories)
             return try req.view().render("createAcronym", context)
         }
     }
 
     func editAcronymPostHandler(_ req: Request) throws -> Future<Response> {
         return try flatMap(to: Response.self, req.parameters.next(Acronym.self), req.content.decode(CreateAcronymData.self)) { acronym, data in
+            let user = try req.requireAuthenticated(User.self)
             acronym.short = data.short
             acronym.long = data.long
-            acronym.userID = data.userID
+            acronym.userID = try user.requireID()
             guard let id = acronym.id else {
                 throw Abort(.internalServerError)
             }

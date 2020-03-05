@@ -7,5 +7,4 @@ import Vapor
 
 struct CreateAcronymContext: Encodable {
     let title: String = "Create An Acronym"
-    let users: Future<[User]>
 }
