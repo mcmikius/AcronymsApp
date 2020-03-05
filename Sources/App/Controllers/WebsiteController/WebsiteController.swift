@@ -181,15 +181,27 @@ struct WebsiteController: RouteCollection {
     }
 
     func registerHandler(_ req: Request) throws -> Future<View> {
-        let context = RegisterContext()
+        let context: RegisterContext
+        if let message = req.query[String.self, at: "message"] {
+            context = RegisterContext(message: message)
+        } else {
+            context = RegisterContext()
+        }
         return try req.view().render("register", context)
     }
 
     func registerPostHandler(_ req: Request, data: RegisterData) throws -> Future<Response> {
         do {
             try data.validate()
-        } catch {
-            return req.future(req.redirect(to: "/register"))
+        } catch (let error) {
+            let redirect: String
+            if let error = error as? ValidationError,
+               let message = error.reason.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+                redirect = "/register?message=\(message)"
+            } else {
+                redirect = "/register?message=Unknown+error"
+            }
+            return req.future(req.redirect(to: redirect))
         }
         let password = try BCrypt.hash(data.password)
         let user = User(name: data.name, username: data.username, password: password)
