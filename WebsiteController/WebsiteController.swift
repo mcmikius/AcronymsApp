@@ -7,6 +7,7 @@ import Vapor
 import Leaf
 
 struct WebsiteController: RouteCollection {
+
     func boot(router: Router) throws {
         router.get(use: indexHandler)
         router.get("acronyms", Acronym.parameter, use: acronymHandler)
@@ -31,7 +32,8 @@ struct WebsiteController: RouteCollection {
     func acronymHandler(_ req: Request) throws -> Future<View> {
         return try req.parameters.next(Acronym.self).flatMap(to: View.self) { acronym in
             return acronym.user.get(on: req).flatMap(to: View.self) { user in
-                let context = AcronymContext(title: acronym.short, acronym: acronym, user: user)
+                let categories = try acronym.categories.query(on: req).all()
+                let context = AcronymContext(title: acronym.short, acronym: acronym, user: user, categories: categories)
                 return try req.view().render("acronym", context)
             }
         }

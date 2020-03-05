@@ -9,4 +9,5 @@ struct AcronymContext: Encodable {
     let title: String
     let acronym: Acronym
     let user: User
+    let categories: Future<[Category]>
 }
