@@ -8,5 +8,6 @@
 import Foundation
 import Vapor
 import FluentPostgreSQL
+import Authentication
 
 extension User: PostgreSQLUUIDModel {}

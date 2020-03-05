@@ -8,6 +8,7 @@
 import Foundation
 import Vapor
 import FluentPostgreSQL
+import Authentication
 
 extension User: Migration {
     static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
