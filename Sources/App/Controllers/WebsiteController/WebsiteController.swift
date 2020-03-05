@@ -81,11 +81,18 @@ struct WebsiteController: RouteCollection {
     }
 
     func createAcronymHandler(_ req: Request) throws -> Future<View> {
-        let context = CreateAcronymContext()
+        let token = try CryptoRandom().generateData(count: 16).base64EncodedString()
+        let context = CreateAcronymContext(csrfToken: token)
+        try req.session()["CSRF_TOKEN"] = token
         return try req.view().render("createAcronym", context)
     }
 
     func createAcronymPostHandler(_ req: Request, data: CreateAcronymData) throws -> Future<Response> {
+        let expectedToken = try req.session()["CSRF_TOKEN"]
+        try req.session()["CSRF_TOKEN"] = nil
+        guard let csrfToken = data.csrfToken, expectedToken == csrfToken else {
+            throw Abort(.badRequest)
+        }
         let user = try req.requireAuthenticated(User.self)
         let acronym = try Acronym(short: data.short, long: data.long, userID: user.requireID())
         return acronym.save(on: req).flatMap(to: Response.self) { acronym in

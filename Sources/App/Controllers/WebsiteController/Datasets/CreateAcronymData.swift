@@ -9,4 +9,5 @@ struct CreateAcronymData: Content {
     let short: String
     let long: String
     let categories: [String]?
+    let csrfToken: String?
 }
