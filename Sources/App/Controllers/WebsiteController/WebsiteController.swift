@@ -21,6 +21,8 @@ struct WebsiteController: RouteCollection {
         authSessionRoutes.get("login", use: loginHandler)
         authSessionRoutes.post(LoginPostData.self, at: "login", use: loginPostHandler)
         authSessionRoutes.post("logout", use: logoutHandler)
+        authSessionRoutes.get("register", use: registerHandler)
+        authSessionRoutes.post(RegisterData.self, at: "register", use: registerPostHandler)
 
         let protectedRoutes = authSessionRoutes.grouped(RedirectMiddleware<User>(path: "/login"))
         protectedRoutes.get("acronyms", "create", use: createAcronymHandler)
@@ -176,5 +178,19 @@ struct WebsiteController: RouteCollection {
     func logoutHandler(_ req: Request) throws -> Response {
         try req.unauthenticateSession(User.self)
         return req.redirect(to: "/")
+    }
+
+    func registerHandler(_ req: Request) throws -> Future<View> {
+        let context = RegisterContext()
+        return try req.view().render("register", context)
+    }
+
+    func registerPostHandler(_ req: Request, data: RegisterData) throws -> Future<Response> {
+        let password = try BCrypt.hash(data.password)
+        let user = User(name: data.name, username: data.username, password: password)
+        return user.save(on: req).map(to: Response.self) { user in
+            try req.authenticateSession(user)
+            return req.redirect(to: "/")
+        }
     }
 }
