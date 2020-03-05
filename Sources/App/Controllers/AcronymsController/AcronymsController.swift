@@ -51,7 +51,6 @@ struct AcronymsController: RouteCollection {
         return try flatMap(to: Acronym.self, req.parameters.next(Acronym.self), req.content.decode(AcronymCreateData.self)) { acronym, updateData in
             acronym.short = updateData.short
             acronym.long = updateData.long
-            acronym.userID = updateData.userID
             let user = try req.requireAuthenticated(User.self)
             acronym.userID = try user.requireID()
             return acronym.save(on: req)
