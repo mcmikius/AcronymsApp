@@ -20,6 +20,7 @@ struct WebsiteController: RouteCollection {
         authSessionRoutes.get("categories", Category.parameter, use: categoryHandler)
         authSessionRoutes.get("login", use: loginHandler)
         authSessionRoutes.post(LoginPostData.self, at: "login", use: loginPostHandler)
+        authSessionRoutes.post("logout", use: logoutHandler)
 
         let protectedRoutes = authSessionRoutes.grouped(RedirectMiddleware<User>(path: "/login"))
         protectedRoutes.get("acronyms", "create", use: createAcronymHandler)
@@ -31,7 +32,8 @@ struct WebsiteController: RouteCollection {
 
     func indexHandler(_ req: Request) throws -> Future<View> {
         return Acronym.query(on: req).all().flatMap(to: View.self) { acronyms in
-            let context = IndexContext(title: "Home page", acronyms: acronyms)
+            let userLoggedIn = try req.isAuthenticated(User.self)
+            let context = IndexContext(title: "Home page", acronyms: acronyms, userLoggedIn: userLoggedIn)
             return try req.view().render("index", context)
         }
     }
@@ -161,5 +163,10 @@ struct WebsiteController: RouteCollection {
             try req.authenticateSession(user)
             return req.redirect(to: "/")
         }
+    }
+
+    func logoutHandler(_ req: Request) throws -> Response {
+        try req.unauthenticateSession(User.self)
+        return req.redirect(to: "/")
     }
 }

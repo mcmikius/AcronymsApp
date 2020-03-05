@@ -8,4 +8,5 @@ import Vapor
 struct IndexContext: Encodable {
     let title: String
     let acronyms: [Acronym]
+    let userLoggedIn: Bool
 }
