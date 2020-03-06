@@ -204,7 +204,7 @@ struct WebsiteController: RouteCollection {
             return req.future(req.redirect(to: redirect))
         }
         let password = try BCrypt.hash(data.password)
-        let user = User(name: data.name, username: data.username, password: password)
+        let user = User(name: data.name, username: data.username, password: password, email: data.emailAddress)
         return user.save(on: req).map(to: Response.self) { user in
             try req.authenticateSession(user)
             return req.redirect(to: "/")
