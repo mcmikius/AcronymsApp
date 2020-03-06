@@ -42,7 +42,7 @@ final class UserTests: XCTestCase {
     }
     
     func testUserCanBeSavedWithAPI() throws {
-        let user = User(name: usersName, username: usersUsername, password: "password")
+        let user = User(name: usersName, username: usersUsername, password: "password", email: "\(usersUsername)@test.com")
         let receivedUser = try app.getResponse(to: usersURI, method: .POST, headers: ["Content-Type": "application/json"], data: user, decodeTo: User.Public.self, loggedInRequest: true)
         
         XCTAssertEqual(receivedUser.name, usersName)
