@@ -236,7 +236,7 @@ struct WebsiteController: RouteCollection {
                 Click here</a> to reset your password.</p>
                 """
                 let emailAddress = EmailAddress(email: user.email, name: user.name)
-                let fromEmail = EmailAddress(email: "0xtimc@gmail.com", name: "Vapor TIL")
+                let fromEmail = EmailAddress(email: "0xtimc@gmail.com", name: "Vapor Acronym")
                 let emailConfig = Personalization(to: [emailAddress], subject: "Reset Your Password")
                 let email = SendGridEmail(personalizations: [emailConfig], from: fromEmail, content: [["type": "text/html", "value": emailContent]])
                 let sendGridClient = try req.make(SendGridClient.self)
