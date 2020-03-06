@@ -38,6 +38,20 @@ struct ImperialController: RouteCollection {
     }
 
     func processGitHubLogin(request: Request, token: String) throws -> Future<ResponseEncodable> {
-        return request.future(request.redirect(to: "/"))
+        return try GitHub.getUser(on: request).flatMap(to: ResponseEncodable.self) { userInfo in
+            return User.query(on: request).filter(\.username == userInfo.login).first().flatMap(to: ResponseEncodable.self) { foundUser in
+                guard let existingUser = foundUser else {
+                    let user = User(name: userInfo.name,
+                        username: userInfo.login,
+                        password: UUID().uuidString)
+                    return user.save(on: request).map(to: ResponseEncodable.self) { user in
+                        try request.authenticateSession(user)
+                        return request.redirect(to: "/")
+                    }
+                }
+                try request.authenticateSession(existingUser)
+                return request.future(request.redirect(to: "/"))
+            }
+        }
     }
 }
