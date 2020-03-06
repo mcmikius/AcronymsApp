@@ -14,6 +14,11 @@ struct ImperialController: RouteCollection {
             fatalError("Google callback URL not set")
         }
         try router.oAuth(from: Google.self, authenticate: "login-google", callback: googleCallbackURL, scope: ["profile", "email"], completion: processGoogleLogin)
+
+        guard let githubCallbackURL = Environment.get("GITHUB_CALLBACK_URL") else {
+            fatalError("GitHub callback URL not set")
+        }
+        try router.oAuth(from: GitHub.self, authenticate: "login-github", callback: githubCallbackURL, completion: processGitHubLogin)
     }
 
     func processGoogleLogin(request: Request, token: String) throws -> Future<ResponseEncodable> {
@@ -30,5 +35,9 @@ struct ImperialController: RouteCollection {
                 return request.future(request.redirect(to: "/"))
             }
         }
+    }
+
+    func processGitHubLogin(request: Request, token: String) throws -> Future<ResponseEncodable> {
+        return request.future(request.redirect(to: "/"))
     }
 }

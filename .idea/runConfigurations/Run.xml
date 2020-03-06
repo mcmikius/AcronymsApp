@@ -2,6 +2,9 @@
   <configuration default="false" name="Run" type="AppleRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="AcronymsApp" TARGET_NAME="Run" CONFIG_NAME="Debug" SCHEME_NAME="Run" IS_LOCATION_SIMULATION_ALLOWED="true" APPLICATION_LANGUAGE="IDELaunchSchemeLanguageUseSystemLanguage" APPLICATION_REGION="" RUN_TARGET_PROJECT_NAME="AcronymsApp" RUN_TARGET_NAME="Run" MAKE_ACTIVE="TRUE" SHOULD_DEBUG_EXTENSIONS="false">
     <envs>
       <env name="GOOGLE_CALLBACK_URL" value="http://localhost:8080/oauth/google" />
+      <env name="GITHUB_CALLBACK_URL" value="http://localhost:8080/oauth/github" />
+      <env name="GITHUB_CLIENT_ID" value="e3b318a052728fa8976d" />
+      <env name="GITHUB_CLIENT_SECRET" value="c81339b00ca818e091f661f6d6b75ff0b58f4c09" />
       <env name="GOOGLE_CLIENT_ID" value="933363779667-2kfbkbt2fcud2t33ogcfje2qk66kkdag.apps.googleusercontent.com" />
       <env name="GOOGLE_CLIENT_SECRET" value="qMd-_WmItVjpqtdOoQ4cyDjk" />
     </envs>
