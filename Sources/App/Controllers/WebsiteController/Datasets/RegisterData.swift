@@ -19,7 +19,7 @@ extension RegisterData: Validatable, Reflectable {
         try validations.add(\.name, .ascii)
         try validations.add(\.username, .alphanumeric && .count(3...))
         try validations.add(\.password, .count(8...))
-        try validations.add(\.emailAddress, email)
+        try validations.add(\.emailAddress, .email)
         validations.add("password match") { model in
             guard model.password == model.confirmPassword else {
                 throw BasicValidationError("password don't match")

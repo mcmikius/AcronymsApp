@@ -27,7 +27,7 @@ extension GitHub {
     static func getEmails(on request: Request) throws -> Future<[GitHubEmailInfo]> {
         var headers = HTTPHeaders()
         headers.bearerAuthorization =
-            try BearerAuthorization(token: request«.accessToken())
+            try BearerAuthorization(token: request.accessToken())
 
         let githubUserAPIURL = "https://api.github.com/user/emails"
         return try request.client().get(githubUserAPIURL, headers: headers).map(to: [GitHubEmailInfo].self) { response in
