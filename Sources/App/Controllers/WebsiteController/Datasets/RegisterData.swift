@@ -11,6 +11,7 @@ struct RegisterData: Content {
     let password: String
     let confirmPassword: String
     let emailAddress: String
+    let twitterURL: String?
 }
 
 extension RegisterData: Validatable, Reflectable {

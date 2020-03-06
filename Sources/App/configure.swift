@@ -58,6 +58,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     migrations.add(model: Token.self, database: .psql)
     migrations.add(migration: AdminUser.self, database: .psql)
     migrations.add(model: ResetPasswordToken.self, database: .psql)
+    migrations.add(migration: AddTwitterURLToUser.self, database: .psql)
     services.register(migrations)
 
     var commandConfig = CommandConfig.default()

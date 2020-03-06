@@ -14,8 +14,12 @@ extension User: Migration {
     static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
         return Database.create(self, on: connection) { builder in
             try addProperties(to: builder)
-            builder.unique(on: \.username)
-            builder.unique(on: \.email)
+//            builder.unique(on: \.username)
+//            builder.unique(on: \.email)
+            builder.field(for: \.id, isIdentifier: true)
+            builder.field(for: \.name)
+            builder.field(for: \.username)
+            builder.field(for: \.password)
         }
     }
 }
