@@ -15,6 +15,7 @@ extension User: Migration {
         return Database.create(self, on: connection) { builder in
             try addProperties(to: builder)
             builder.unique(on: \.username)
+            builder.unique(on: \.email)
         }
     }
 }
