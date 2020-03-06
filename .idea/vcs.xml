@@ -17,6 +17,7 @@
     <mapping directory="$PROJECT_DIR$/.build/checkouts/multipart" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.build/checkouts/postgresql" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.build/checkouts/routing" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/.build/checkouts/sendgrid-provider" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.build/checkouts/service" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.build/checkouts/sql" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.build/checkouts/sqlite" vcs="Git" />
