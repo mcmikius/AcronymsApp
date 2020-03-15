@@ -17,11 +17,12 @@ struct UsersController: RouteCollection {
         usersRoute.get(use: getAllHandler)
         usersRoute.get(User.parameter, use: getHandler)
         usersRoute.get(User.parameter, "acronyms", use: getAcronymsHandler)
-
+        usersRoute.get("acronyms", use: getAllUsersWithAcronyms)
+        
         let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
         let basicAuthGroup = usersRoute.grouped(basicAuthMiddleware)
         basicAuthGroup.post("login", use: loginHandler)
-
+        
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let guardAuthMiddleware = User.guardAuthMiddleware()
         let tokenAuthGroup = usersRoute.grouped(tokenAuthMiddleware, guardAuthMiddleware)
@@ -48,7 +49,7 @@ struct UsersController: RouteCollection {
     }
     
     func getV2Handler(_ req: Request) throws -> Future<User.PublicV2> {
-      return try req.parameters.next(User.self).convertToPublicV2()
+        return try req.parameters.next(User.self).convertToPublicV2()
     }
     
     func getAcronymsHandler(_ req: Request) throws -> Future<[Acronym]> {
@@ -56,7 +57,7 @@ struct UsersController: RouteCollection {
             try user.acronyms.query(on: req).all()
         })
     }
-
+    
     func loginHandler(_ req: Request) throws -> Future<Token> {
         let user = try req.requireAuthenticated(User.self)
         let token = try Token.generation(for: user)
@@ -72,6 +73,10 @@ struct UsersController: RouteCollection {
     }
     
     func restoreHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        let requestUser = try req.requireAuthenticated(User.self)
+        guard requestUser.userType == .admin else {
+            throw Abort(.forbidden)
+        }
         let userID = try req.parameters.next(UUID.self)
         return User.query(on: req, withSoftDeleted: true).filter(\.id == userID).first().flatMap(to: HTTPStatus.self) { (user) in
             guard let user = user else {
@@ -82,9 +87,29 @@ struct UsersController: RouteCollection {
     }
     
     func forceDeleteHandler(_ req: Request) throws -> Future<HTTPStatus> {
+        let requestUser = try req.requireAuthenticated(User.self)
+        guard requestUser.userType == .admin else {
+            throw Abort(.forbidden)
+        }
         return try req.parameters.next(User.self).flatMap(to: HTTPStatus.self, { (user) in
             user.delete(force: true, on: req).transform(to: .noContent)
         })
     }
     
+    func getAllUsersWithAcronyms(_ req: Request) throws -> Future<[UserWithAcronyms]> {
+        return User.query(on: req).all().flatMap(to: [UserWithAcronyms].self) { users in
+            try users.map { user in
+                try user.acronyms.query(on: req).all().map { acronyms in
+                    UserWithAcronyms(id: user.id, name: user.name, username: user.username, acronyms: acronyms)
+                }
+            }.flatten(on: req)
+        }
+    }
+}
+
+struct UserWithAcronyms: Content {
+    let id: UUID?
+    let name: String
+    let username: String
+    let acronyms: [Acronym]
 }
