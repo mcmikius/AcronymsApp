@@ -3,6 +3,7 @@ import Vapor
 import Leaf
 import Authentication
 import SendGrid
+import Redis
 
 /// Called before your application initializes.
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
@@ -10,6 +11,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     try services.register(FluentPostgreSQLProvider())
     try services.register(LeafProvider())
     try services.register(AuthenticationProvider())
+    try services.register(RedisProvider())
     try services.register(SendGridProvider())
 
     // Register routes to the router
@@ -71,6 +73,12 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     }
     let database = PostgreSQLDatabase(config: databaseConfig)
     databases.add(database: database, as: .psql)
+    var redisConfig = RedisClientConfig()
+    if let redisHostname = Environment.get("REDIS_HOSTNAME") {
+        redisConfig.hostname = redisHostname
+    }
+    let redis = try RedisDatabase(config: redisConfig)
+    databases.add(database: redis, as: .redis)
     services.register(databases)
 
     // Configure migrations
@@ -98,6 +106,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     
     config.prefer(LeafRenderer.self, for: ViewRenderer.self)
     config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+    config.prefer(RedisCache.self, for: KeyedCache.self)
     
     // Configure SendGrid
     guard let sendGridAPIKey = Environment.get("SENDGRID_API_KEY") else {
