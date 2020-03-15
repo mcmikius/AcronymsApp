@@ -8,4 +8,7 @@
 import Vapor
 import FluentPostgreSQL
 
-extension Acronym: PostgreSQLModel {}
+extension Acronym: PostgreSQLModel {
+    static let createdAtKey: TimestampKey? = \.createdAt
+    static let updatedAtKey: TimestampKey? = \.updatedAt
+}

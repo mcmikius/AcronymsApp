@@ -22,6 +22,7 @@ struct AcronymsController: RouteCollection {
         acronymsRoutes.get("sorted", use: sortedHandler)
         acronymsRoutes.get(Acronym.parameter, "user", use: getUserHandler)
         acronymsRoutes.get(Acronym.parameter, "categories", use: getCategoriesHandler)
+        acronymsRoutes.get("mostRecent", use: getMostRecentAcronyms)
 
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let guardAuthMiddleware = User.guardAuthMiddleware()
@@ -102,5 +103,9 @@ struct AcronymsController: RouteCollection {
         ) { acronym, category in
             return acronym.categories.detach(category, on: req).transform(to: .noContent)
         }
+    }
+    
+    func getMostRecentAcronyms(_ req: Request) throws -> Future<[Acronym]> {
+        return Acronym.query(on: req).sort(\.updatedAt, .descending).all()
     }
 }
