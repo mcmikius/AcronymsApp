@@ -24,6 +24,7 @@ struct AcronymsController: RouteCollection {
         acronymsRoutes.get(Acronym.parameter, "categories", use: getCategoriesHandler)
         acronymsRoutes.get("mostRecent", use: getMostRecentAcronyms)
         acronymsRoutes.get("users", use: getAcronymsWithUser)
+        acronymsRoutes.get("raw", use: getAllAcronymsRaw)
 
         let tokenAuthMiddleware = User.tokenAuthMiddleware()
         let guardAuthMiddleware = User.guardAuthMiddleware()
@@ -116,6 +117,12 @@ struct AcronymsController: RouteCollection {
               .map { acronym, user -> AcronymWithUser in
                 AcronymWithUser(id: acronym.id, short: acronym.short, long: acronym.long, user: user.convertToPublic())
             }
+        }
+    }
+    
+    func getAllAcronymsRaw(_ req: Request) throws -> Future<[Acronym]> {
+        return req.withPooledConnection(to: .psql) { conn in
+          conn.raw("SELECT * from \"Acronym\"").all(decoding: Acronym.self)
         }
     }
 }
