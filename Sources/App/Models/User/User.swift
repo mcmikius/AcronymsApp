@@ -18,6 +18,7 @@ final class User: Codable {
     var password: String
     var email: String
     var profilePicture: String?
+    var deletedAt: Date?
     var twitterURL: String?
     
     init(name: String, username: String, password: String, email: String, profilePicture: String? = nil, twitterURL: String? = nil) {

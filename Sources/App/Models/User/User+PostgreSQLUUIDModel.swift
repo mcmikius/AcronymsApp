@@ -10,4 +10,6 @@ import Vapor
 import FluentPostgreSQL
 import Authentication
 
-extension User: PostgreSQLUUIDModel {}
+extension User: PostgreSQLUUIDModel {
+    static let deletedAtKey: TimestampKey? = \.deletedAt
+}
