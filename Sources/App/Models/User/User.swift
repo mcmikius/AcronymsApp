@@ -19,15 +19,17 @@ final class User: Codable {
     var email: String
     var profilePicture: String?
     var deletedAt: Date?
+    var userType: UserType
     var twitterURL: String?
     
-    init(name: String, username: String, password: String, email: String, profilePicture: String? = nil, twitterURL: String? = nil) {
+    init(name: String, username: String, password: String, email: String, profilePicture: String? = nil, twitterURL: String? = nil, userType: UserType = .standard) {
         self.name = name
         self.username = username
         self.password = password
         self.email = email
         self.profilePicture = profilePicture
         self.twitterURL = twitterURL
+        self.userType = userType
     }
     
     final class Public: Codable {
@@ -99,7 +101,7 @@ struct AdminUser: Migration {
         guard let hashedPassword = password else {
             fatalError("Failed to create admin user")
         }
-        let user = User(name: "Admin", username: "admin", password: hashedPassword, email: "admin@localhost.local")
+        let user = User(name: "Admin", username: "admin", password: hashedPassword, email: "admin@localhost.local", userType: .admin)
         return user.save(on: connection).transform(to: ())
     }
     static func revert(on connection: PostgreSQLConnection) -> Future<Void> {
